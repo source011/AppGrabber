@@ -57,7 +57,7 @@ $installer | Out-File -encoding ascii "$folderLoc\Install_VLC.bat"
 # Copy config for EXE installer to build folder
 $config = @"
 ;!@Install@!UTF-8!
-Title="VLC"
+Title="$recepieName"
 Progress="no"
 RunProgram="Install_VLC.bat"
 ;!@InstallEnd@!
@@ -76,17 +76,15 @@ set-alias sz "$templateLocation\7-Zip\7z.exe"
 $zipFile = "temp.7z"
 sz a -r "$folderLoc\$zipFile" "$folderLoc\*.*" | Out-Null
 
-$exeName = $recepieName + "_" + $recepieVersion
-
 # Create EXE installer from compressed archive
 $command = @'
-cmd.exe /C copy /b "$folderLoc\7zS.sfx" + "$folderLoc\config.txt" + "$folderLoc\$zipFile" "$folderLoc\$exeName.exe"
+cmd.exe /C copy /b "$folderLoc\7zS.sfx" + "$folderLoc\config.txt" + "$folderLoc\$zipFile" "$folderLoc\$($recepieName)_$($recepieVersion).exe"
 '@
 
 Invoke-Expression -Command:$command | Out-Null
 
-if(Test-Path "$folderLoc\$exeName.exe"){
-	Get-ChildItem -Path  "$folderLoc" -Recurse -exclude "$exeName.exe" | Remove-Item -force -recurse
+if(Test-Path "$folderLoc\$($recepieName)_$($recepieVersion).exe"){
+	Get-ChildItem -Path  "$folderLoc" -Recurse -exclude "$($recepieName)_$($recepieVersion).exe" | Remove-Item -force -recurse
 
 	Write-Host "$recepieName $recepieVersion - Build complete!" -ForegroundColor 'green'
 	LogWrite "$recepieName $recepieVersion - Build complete!"

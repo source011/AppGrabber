@@ -1,39 +1,26 @@
-#	Silverlight
+#	FileZilla
 
+# Get Filezilla version
+$recepieVersion = ((Invoke-WebRequest -Uri 'https://filezilla-project.org/download.php?show_all=1').Links | Where innerHtml -like "FileZilla_*_win64-setup.exe").innerText
+$recepieVersion = $recepieVersion -Replace "FileZilla_", ""
+$recepieVersion = $recepieVersion -Replace "_win64-setup.exe", ""
 
-# Get latest version number
-$html = invoke-webrequest "https://en.wikipedia.org/wiki/Microsoft_Silverlight_version_history"
-$table = $html.parsedHtml.getElementsByTagName("table")[0]
-$TR = $table.getElementsByTagName("tr") | where { $_.innerText -like "*.*.*.*" } | Select-Object -Last 1
-$recepieVersion = $TR.getElementsByTagName("td")[1].innerText
-
-
-
-$url = "http://bit.ly/1K5WrPA" # Bitly goes to -> http://go.microsoft.com/fwlink/?LinkID=229321
-    $WebClientObject = New-Object System.Net.WebClient
-    $WebRequest = [System.Net.WebRequest]::create($URL)
-    $WebResponse = $WebRequest.GetResponse()
-    $ActualDownloadURL = $WebResponse.ResponseUri.AbsoluteUri
-    $ObjectProperties = @{ 'Shortened URL' = $URL;
-                           'Actual URL' = $ActualDownloadURL}
-    $ResultsObject = New-Object -TypeName PSObject -Property $ObjectProperties
-    $WebResponse.Close()
-$url = $ResultsObject.'Actual URL'
+$url = "https://downloads.sourceforge.net/project/filezilla/FileZilla_Client/$recepieVersion/FileZilla_$($recepieVersion)_win64-setup.exe"
 
 # Check version
-	if(!(Test-Path "$dlLocation\file_versions\Silverlight.txt")){
-	New-Item "$dlLocation\file_versions\Silverlight.txt" -Type file | Out-Null
+	if(!(Test-Path "$dlLocation\file_versions\FileZilla.txt")){
+	New-Item "$dlLocation\file_versions\FileZilla.txt" -Type file | Out-Null
 	}
 	
-	$recepieVersionOld = Get-Content "$dlLocation\file_versions\Silverlight.txt"
+	$recepieVersionOld = Get-Content "$dlLocation\file_versions\FileZilla.txt"
 	
 	if($recepieVersion -gt $recepieVersionOld){
 		$appsToDL++
 		try {
-			Start-BitsTransfer -Source "$url" -Destination $dlLocation
+			Start-BitsTransfer -Source $url -Destination $dlLocation
 			Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 			LogWrite "$recepieName $recepieVersion - Download complete!"
-			Set-content "$dlLocation\file_versions\Silverlight.txt" -value $recepieVersion
+			Set-content "$dlLocation\file_versions\FileZilla.txt" -value $recepieVersion
 			$build = 1
 		} catch {
 			Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
@@ -43,7 +30,7 @@ $url = $ResultsObject.'Actual URL'
 		Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'
 		LogWrite "$recepieName - No updates found!"
 	}
-	
+
 # Build package
 if($build -eq 1){
 $build = 0
@@ -60,13 +47,13 @@ $config = @"
 ;!@Install@!UTF-8!
 Title="$recepieName"
 Progress="no"
-RunProgram="Silverlight_x64.exe /q"
+RunProgram="FileZilla_$($recepieVersion)_win64-setup.exe /S"
 ;!@InstallEnd@!
 "@
 $config | Out-File -encoding ascii "$folderLoc\config.txt"
 
 # Move downloaded file to build folder
-Move-Item "$dlLocation\Silverlight_x64.exe" -Destination "$folderLoc\Silverlight_x64.exe"
+Move-Item "$dlLocation\FileZilla_$($recepieVersion)_win64-setup.exe" -Destination "$folderLoc\FileZilla_$($recepieVersion)_win64-setup.exe"
 
 # Copy required sfx file to build folder
 Copy-Item "$templateLocation\7zS.sfx" -Destination "$folderLoc\7zS.sfx"
