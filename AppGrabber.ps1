@@ -75,24 +75,6 @@ if(!(Test-Path $templateLocation)){
 	New-Item $templateLocation -Type Directory | Out-Null
 }
 
-###############################################################################################
-
-<#
-# Function for redirected links
-Function Get-RedirectedUrl {
-    Param (
-        [Parameter(Mandatory=$true)]
-        [String]$URL
-    )
-    $request = [System.Net.WebRequest]::Create($url)
-    $request.AllowAutoRedirect=$false
-    $response=$request.GetResponse() 
-    If ($response.StatusCode -eq "Found")
-    {
-        $response.GetResponseHeader("Location")
-    }
-}
-#>
 
 ################################# Define softwares ###########################################
 $startTime = Get-Date -Format HH:mm:ss
