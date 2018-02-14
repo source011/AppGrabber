@@ -4,21 +4,23 @@ Function SlackWrite {
     Param ([string]$slackstring)
 
 $payload = @{
-	"channel" = "" #channel
+	"channel" = "#CHANNEL"
 	"text" = "$slackstring"
 }
 
 Invoke-WebRequest `
 	-Body (ConvertTo-Json -Compress -InputObject $payload) `
 	-Method Post `
-	-Uri "" | Out-Null # Webhook
-}
+	-Uri "WEBHOOK-URL" | Out-Null
+} 
+
+################################# AppGrabber Settings ###########################################
 
 # Download location
 $dlLocation = "$PSSCRIPTROOT\AppGrabber_Downloads"
 
 if(!(Test-Path $dlLocation)){
-New-Item $dlLocation -Type Directory | Out-Null
+	New-Item $dlLocation -Type Directory | Out-Null
 }
 
 # Recepies location
@@ -30,7 +32,7 @@ $totalRecepies = Get-Childitem $recepieLocation | where {$_.extension -in ".ps1"
 $fvLocation = "$PSSCRIPTROOT\AppGrabber_Downloads\file_versions"
 
 if(!(Test-Path $fvLocation)){
-New-Item $fvLocation -Type Directory | Out-Null
+	New-Item $fvLocation -Type Directory | Out-Null
 }
 
 # Clean download folder at script start? (0=Disabled,1=Enabled)
@@ -47,10 +49,10 @@ $logFile = "$logPath\$logFileName" # Combine LPath and LFile to make one full pa
 
 # Create log file and folder if missing
 if(!(Test-Path $logPath)){
-New-Item $logPath -Type Directory | Out-Null
+	New-Item $logPath -Type Directory | Out-Null
 }
 if(!(Test-Path $logFile)){
-New-Item $logFile -Type file | Out-Null
+	New-Item $logFile -Type file | Out-Null
 }
 
 Function LogWrite {
@@ -60,6 +62,22 @@ Function LogWrite {
     Add-content $logFile -value $logText
 }
 
+################################# Build Settings ###########################################
+
+# Builds location
+$buildLocation = "$PSSCRIPTROOT\AppGrabber_Builds"
+if(!(Test-Path $buildLocation)){
+	New-Item $buildLocation -Type Directory | Out-Null
+}
+
+$templateLocation = "$PSSCRIPTROOT\AppGrabber_Templates"
+if(!(Test-Path $templateLocation)){
+	New-Item $templateLocation -Type Directory | Out-Null
+}
+
+###############################################################################################
+
+<#
 # Function for redirected links
 Function Get-RedirectedUrl {
     Param (
@@ -74,6 +92,7 @@ Function Get-RedirectedUrl {
         $response.GetResponseHeader("Location")
     }
 }
+#>
 
 ################################# Define softwares ###########################################
 $startTime = Get-Date -Format HH:mm:ss
