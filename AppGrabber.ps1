@@ -1,19 +1,3 @@
-# Slack integration
-
-Function SlackWrite {
-    Param ([string]$slackstring)
-
-$payload = @{
-	"channel" = "#CHANNEL"
-	"text" = "$slackstring"
-}
-
-Invoke-WebRequest `
-	-Body (ConvertTo-Json -Compress -InputObject $payload) `
-	-Method Post `
-	-Uri "WEBHOOK-URL" | Out-Null
-} 
-
 ################################# AppGrabber Settings ###########################################
 
 # Download location
@@ -86,7 +70,6 @@ Write-Host("`n")
 Write-Host "============================================================" -ForegroundColor 'green'
 Write-Host "AppGrabber - Script started" -ForegroundColor 'green'
 LogWrite "AppGrabber - Script started"
-SlackWrite "AppGrabber - Script started"
 Write-Host "============================================================" -ForegroundColor 'green'
 
 $countRecepie = 1
@@ -103,22 +86,10 @@ Write-Host "------------------------------------------------------------"  -Fore
 $countRecepie++
 }
 
-# Updates available (Slack)
-if($appsToDL -gt 0){
-	if($appsToDL -eq 1){
-		SlackWrite "1 new app grabbed!"
-	} else {
-		SlackWrite "$appsToDL new apps grabbed!"
-	}
-} else {
-	SlackWrite "Sorry! No new apps to grab.."
-}
-
 $endTime = Get-Date -Format HH:mm:ss
 $totalTime = New-TimeSpan $startTime $endTime
 Write-Host "============================================================" -ForegroundColor 'green'
 Write-Host "Script has completed in $totalTime " -ForegroundColor 'green'
 LogWrite "Script has completed in $totalTime"
-SlackWrite "Script has completed in $totalTime"
 Write-Host "============================================================" -ForegroundColor 'green'
 LogWrite   "============================================================"
