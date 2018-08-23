@@ -1,3 +1,23 @@
+# IE fix
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /t REG_DWORD /v 1A10 /f /d 0
+################################# SLACK INTEGRATION #############################################
+$enableSlack = 1
+
+if($enableSlack){
+Function SlackWrite {
+    Param ([string]$slackstring)
+
+$payload = @{
+	"channel" = "#channel"
+	"text" = "$slackstring"
+}
+
+Invoke-WebRequest `
+	-Body (ConvertTo-Json -Compress -InputObject $payload) `
+	-Method Post `
+	-Uri "" | Out-Null # Webhook https://hooks.slack.com/services/T0356Q2CJ/B94KP788G/fqYMp2i9rQ1uNHw1A2342
+}
+}
 ################################# AppGrabber Settings ###########################################
 
 # Download location
@@ -48,6 +68,9 @@ Function LogWrite {
 
 ################################# Build Settings ###########################################
 
+# Build output extension
+$buildMsi = 0 # 1 / 0 (on / off)
+
 # Builds location
 $buildLocation = "$PSSCRIPTROOT\AppGrabber_Builds"
 if(!(Test-Path $buildLocation)){
@@ -70,6 +93,9 @@ Write-Host("`n")
 Write-Host "============================================================" -ForegroundColor 'green'
 Write-Host "AppGrabber - Script started" -ForegroundColor 'green'
 LogWrite "AppGrabber - Script started"
+SlackWrite "============================================================"
+SlackWrite "*AppGrabber - Script started*"
+SlackWrite "------------------------------------------------------------"
 Write-Host "============================================================" -ForegroundColor 'green'
 
 $countRecepie = 1
@@ -88,8 +114,27 @@ $countRecepie++
 
 $endTime = Get-Date -Format HH:mm:ss
 $totalTime = New-TimeSpan $startTime $endTime
+
+# Updates available (Slack)
+if($appsToDL -gt 0){
+	if($appsToDL -eq 1){
+		SlackWrite "*1* new app grabbed!"
+        SlackWrite "*Script has completed in $totalTime*"
+        SlackWrite "============================================================"
+	} else {
+		SlackWrite "*$appsToDL* new apps grabbed!"
+        SlackWrite "*Script has completed in $totalTime*"
+        SlackWrite "============================================================"
+	}
+} else {
+	#SlackWrite "*Sorry! No new apps to grab..*"
+}
+
 Write-Host "============================================================" -ForegroundColor 'green'
 Write-Host "Script has completed in $totalTime " -ForegroundColor 'green'
 LogWrite "Script has completed in $totalTime"
 Write-Host "============================================================" -ForegroundColor 'green'
 LogWrite   "============================================================"
+
+#IE Fix
+reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /v 1A10 /f
