@@ -19,7 +19,7 @@ if($recepieVersion -gt $recepieVersionOld){
     SlackWrite "New update found! :package: *$recepieName $recepieVersion*"
   }
   try {
-    Start-BitsTransfer -Source "$url" -Destination "$dlLocation\AdobeAIRInstaller.exe"
+    Start-BitsTransfer -Source "$url" -Destination "$dlLocation\AdobeAIRInstaller.exe" -ErrorAction SilentlyContinue -ErrorVariable dlErr
     Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
     LogWrite "$recepieName $recepieVersion - Download complete!"
     Set-content "$dlLocation\file_versions\Adobe_Air.txt" -value $recepieVersion
@@ -27,6 +27,7 @@ if($recepieVersion -gt $recepieVersionOld){
   } catch {
     Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
     LogWrite "$recepieName $recepieVersion - Download failed!"
+    LogWrite "$dlErr"
   }
 } else {
   Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

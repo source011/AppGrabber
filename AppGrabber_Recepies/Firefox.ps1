@@ -20,7 +20,7 @@ $url = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win&lang
 		SlackWrite "New update found! :package: *$recepieName $recepieVersion*"
     }
     try {
-      Start-BitsTransfer -Source "$url" -Destination "$dlLocation\Firefox Setup $($recepieVersion).msi"
+      Start-BitsTransfer -Source "$url" -Destination "$dlLocation\Firefox Setup $($recepieVersion).msi" -ErrorAction SilentlyContinue -ErrorVariable dlErr
 			Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 			LogWrite "$recepieName $recepieVersion - Download complete!"
 			Set-content "$dlLocation\file_versions\Firefox.txt" -value $recepieVersion
@@ -28,6 +28,7 @@ $url = "https://download.mozilla.org/?product=firefox-msi-latest-ssl&os=win&lang
 		} catch {
 			Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
 			LogWrite "$recepieName $recepieVersion - Download failed!"
+			LogWrite "$dlErr"
 		}
 	} else {
 		Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

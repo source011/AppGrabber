@@ -22,9 +22,9 @@ $url3 = "https://fpdownload.macromedia.com/pub/flashplayer/pdc/$($recepieVersion
       SlackWrite "New update found! :package: *$recepieName $recepieVersion*"
     }
 		try {
-			Start-BitsTransfer -Source "$url" -Destination "$dlLocation\install_flash_player_$($adobeFlashPlayerUrlVersion)_active_x.msi"
-			Start-BitsTransfer -Source "$url2" -Destination "$dlLocation\install_flash_player_$($adobeFlashPlayerUrlVersion)_plugin.msi"
-			Start-BitsTransfer -Source "$url3" -Destination "$dlLocation\install_flash_player_$($adobeFlashPlayerUrlVersion)_ppapi.msi"
+			Start-BitsTransfer -Source "$url" -Destination "$dlLocation\install_flash_player_$($adobeFlashPlayerUrlVersion)_active_x.msi" -ErrorAction SilentlyContinue -ErrorVariable dlErr
+			Start-BitsTransfer -Source "$url2" -Destination "$dlLocation\install_flash_player_$($adobeFlashPlayerUrlVersion)_plugin.msi" -ErrorAction SilentlyContinue -ErrorVariable dlErr
+			Start-BitsTransfer -Source "$url3" -Destination "$dlLocation\install_flash_player_$($adobeFlashPlayerUrlVersion)_ppapi.msi" -ErrorAction SilentlyContinue -ErrorVariable dlErr
 			
 			Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 			LogWrite "$recepieName $recepieVersion - Download complete!"
@@ -33,6 +33,7 @@ $url3 = "https://fpdownload.macromedia.com/pub/flashplayer/pdc/$($recepieVersion
 		} catch {
 			Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
 			LogWrite "$recepieName $recepieVersion - Download failed!"
+			LogWrite "$dlErr"
 		}
 	} else {
 		Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

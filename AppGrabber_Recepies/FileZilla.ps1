@@ -20,7 +20,7 @@ $url = [System.Net.WebUtility]::HtmlDecode($grabUrl)
 		  SlackWrite "New update found! :package: *$recepieName $recepieVersion*"
     }
     try {
-			Start-BitsTransfer -Source $url -Destination "$dlLocation\FileZilla_$($recepieVersion)_win64-setup.exe"
+			Start-BitsTransfer -Source $url -Destination "$dlLocation\FileZilla_$($recepieVersion)_win64-setup.exe" -ErrorAction SilentlyContinue -ErrorVariable dlErr
 
 			Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 			LogWrite "$recepieName $recepieVersion - Download complete!"
@@ -29,6 +29,7 @@ $url = [System.Net.WebUtility]::HtmlDecode($grabUrl)
 		} catch {
 			Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
 			LogWrite "$recepieName $recepieVersion - Download failed!"
+			LogWrite "$dlErr"
 		}
 	} else {
 		Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

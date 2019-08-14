@@ -23,7 +23,7 @@ $downloadSw = $downloadSw -Replace '//','http://'
     }
     try {
 			# Download
-			Start-BitsTransfer -Source $downloadSw -Destination "$dlLocation\vlc-$recepieVersion-win64.exe"
+			Start-BitsTransfer -Source $downloadSw -Destination "$dlLocation\vlc-$recepieVersion-win64.exe" -ErrorAction SilentlyContinue -ErrorVariable dlErr
 
 			Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 			LogWrite "$recepieName $recepieVersion - Download complete!"
@@ -32,6 +32,7 @@ $downloadSw = $downloadSw -Replace '//','http://'
 		} catch {
 			Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
 			LogWrite "$recepieName $recepieVersion - Download failed!"
+			LogWrite "$dlErr"
 		}
 	} else {
 		Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

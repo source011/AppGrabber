@@ -20,7 +20,7 @@ if($recepieVersion -gt $recepieVersionOld){
 	SlackWrite "New update found! :package: *$recepieName $recepieVersion*"
   }
   try {
-		Start-BitsTransfer -Source $downloadSw -Destination "$dlLocation\iTunes64Setup.exe"
+		Start-BitsTransfer -Source $downloadSw -Destination "$dlLocation\iTunes64Setup.exe" -ErrorAction SilentlyContinue -ErrorVariable dlErr
 
 		Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 		LogWrite "$recepieName $recepieVersion - Download complete!"
@@ -29,6 +29,7 @@ if($recepieVersion -gt $recepieVersionOld){
 	} catch {
 		Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
 		LogWrite "$recepieName $recepieVersion - Download failed!"
+		LogWrite "$dlErr"
 	}
 } else {
 	Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

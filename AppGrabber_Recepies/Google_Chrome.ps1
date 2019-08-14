@@ -16,7 +16,7 @@ if($recepieVersion -gt $recepieVersionOld){
   }
 	$url = "https://dl.google.com/edgedl/chrome/install/GoogleChromeStandaloneEnterprise64.msi"
 	try {
-		Start-BitsTransfer -Source "$url" -Destination "$dlLocation\GoogleChromeStandaloneEnterprise64.msi"
+		Start-BitsTransfer -Source "$url" -Destination "$dlLocation\GoogleChromeStandaloneEnterprise64.msi" -ErrorAction SilentlyContinue -ErrorVariable dlErr
 
 		Write-Host "$recepieName $recepieVersion - Download complete!" -ForegroundColor 'green'
 		LogWrite "$recepieName $recepieVersion - Download complete!"
@@ -25,6 +25,7 @@ if($recepieVersion -gt $recepieVersionOld){
 	} catch {
 		Write-Host "$recepieName $recepieVersion - Download failed!" -ForegroundColor 'red'
 		LogWrite "$recepieName $recepieVersion - Download failed!"
+		LogWrite "$dlErr"
 	}
 } else {
 	Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'

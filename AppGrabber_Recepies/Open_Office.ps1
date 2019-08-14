@@ -29,7 +29,7 @@ if($recepieVersion -gt $recepieVersionOld){
   #  $WebResponse.Close()
 	#  $url = $ResultsObject.'Actual URL'
 	try {
-		Start-BitsTransfer -Source $url -Destination "$dlLocation\Apache_OpenOffice_$($recepieVersion)_Win_x86_install_sv.exe"
+		Start-BitsTransfer -Source $url -Destination "$dlLocation\Apache_OpenOffice_$($recepieVersion)_Win_x86_install_sv.exe" -ErrorAction SilentlyContinue -ErrorVariable dlErr
        # $msbuild = "$dlLocation\wget\wget.exe"
        # $argumentz = "$url -P $dlLocation --no-check-certificate"
        # start-process -WindowStyle hidden $msbuild $argumentz -wait
@@ -54,7 +54,7 @@ if($recepieVersion -gt $recepieVersionOld){
   #  $WebResponse.Close()
 	#$url = $ResultsObject.'Actual URL'
 	try {
-		Start-BitsTransfer -Source $url -Destination "$dlLocation\Apache_OpenOffice_$($recepieVersion)_Win_x86_langpack_en-GB.exe"
+		Start-BitsTransfer -Source $url -Destination "$dlLocation\Apache_OpenOffice_$($recepieVersion)_Win_x86_langpack_en-GB.exe" -ErrorAction SilentlyContinue -ErrorVariable dlErr
     #    $msbuild = "$dlLocation\wget\wget.exe"
     #    $argumentz = "$url -P $dlLocation --no-check-certificate"
     #    start-process -WindowStyle hidden $msbuild $argumentz -wait
@@ -63,6 +63,7 @@ if($recepieVersion -gt $recepieVersionOld){
 	} catch {
 		Write-Host "$recepieName $recepieVersion Language pack - Download failed!" -ForegroundColor 'red'
 		LogWrite "$recepieName $recepieVersion Language pack - Download failed!"
+		LogWrite "$dlErr"
 	}
 } else {
 	Write-Host "$recepieName - No updates found!" -ForegroundColor 'yellow'
