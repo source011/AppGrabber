@@ -1,21 +1,19 @@
-# IE fix
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /t REG_DWORD /v 1A10 /f /d 0
 ################################# SLACK INTEGRATION #############################################
-$enableSlack = 1
+$enableSlack = $false # $true/$false
 
 if($enableSlack){
 Function SlackWrite {
     Param ([string]$slackstring)
 
 $payload = @{
-	"channel" = "#channel"
+	"channel" = "#SLACK-CHANNEL"
 	"text" = "$slackstring"
 }
 
 Invoke-WebRequest `
 	-Body (ConvertTo-Json -Compress -InputObject $payload) `
 	-Method Post `
-	-Uri "" | Out-Null # Webhook https://hooks.slack.com/services/T0356Q2CJ/B94KP788G/fqYMp2i9rQ1uNHw1A2342
+	-Uri "https://CHANGEMEPLEASE.CHANGE" | Out-Null
 }
 }
 ################################# AppGrabber Settings ###########################################
@@ -30,20 +28,13 @@ if(!(Test-Path $dlLocation)){
 # Recepies location
 $recepieLocation = "$PSSCRIPTROOT\AppGrabber_Recepies"
 $recepies = Get-ChildItem "$recepieLocation\*.ps1"
-$totalRecepies = Get-Childitem $recepieLocation | where {$_.extension -in ".ps1"}  | group Extension -NoElement | sort count -desc | Select -ExpandProperty count
+$totalRecepies = Get-Childitem $recepieLocation | Where-Object {$_.extension -in ".ps1"}  | Group-Object Extension -NoElement | Sort-Object count -desc | Select-Object -ExpandProperty count
 
 # File versions location
 $fvLocation = "$PSSCRIPTROOT\AppGrabber_Downloads\file_versions"
 
 if(!(Test-Path $fvLocation)){
 	New-Item $fvLocation -Type Directory | Out-Null
-}
-
-# Clean download folder at script start? (0=Disabled,1=Enabled)
-$cleanFolder = 0
-
-if($cleanFolder -eq 1){
-Remove-Item "$dlLocation\*.*"
 }
 
 # Log vars
@@ -66,10 +57,20 @@ Function LogWrite {
     Add-content $logFile -value $logText
 }
 
-################################# Build Settings ###########################################
+# Function for gathering version numbers
+function Get-ChocoPackageVersion {
+	# Gets the version of the Chocolatey package.
+	[cmdletbinding()]
+	param(
+		[Parameter(Position=0)]
+		# Example: https://chocolatey.org/packages/GoogleChrome
+		[String]$ChocoPackageURL
+	)
+	$script:ChocoPackageVersion = ((Invoke-RestMethod -Uri $ChocoPackageURL).Split("`r`n") | Select-String "<title>").ToString() -split " " | Select-Object -Last 1
+  }
+  
 
-# Build output extension
-$buildMsi = 0 # 1 / 0 (on / off)
+################################# Build Settings ###########################################
 
 # Builds location
 $buildLocation = "$PSSCRIPTROOT\AppGrabber_Builds"
@@ -84,23 +85,23 @@ if(!(Test-Path $templateLocation)){
 
 
 ################################# Define softwares ###########################################
+
+# Set start time
 $startTime = Get-Date -Format HH:mm:ss
+# Set counting apps to download to zero
 $appsToDL = 0
-Write-Host("`n")
-Write-Host("`n")
-Write-Host("`n")
-Write-Host("`n")
+# Count recepies, starts from 1
+$countRecepie = 1
+
+Write-Host("`n`n`n`n`n`n`n")
 Write-Host "============================================================" -ForegroundColor 'green'
 Write-Host "AppGrabber - Script started" -ForegroundColor 'green'
 LogWrite "AppGrabber - Script started"
-SlackWrite "============================================================"
-SlackWrite "*AppGrabber - Script started*"
-SlackWrite "------------------------------------------------------------"
 Write-Host "============================================================" -ForegroundColor 'green'
 
-$countRecepie = 1
-
+# Cycle through all recepies found in $recepieLocation
 forEach($recepie in $recepies){
+# Set app name to the recepie name without .extension
 $recepieName = $recepie.BaseName
 
 Write-Host "Processing $recepieName | Recepie [$countRecepie/$totalRecepies]" -ForegroundColor 'green'
@@ -116,25 +117,20 @@ $endTime = Get-Date -Format HH:mm:ss
 $totalTime = New-TimeSpan $startTime $endTime
 
 # Updates available (Slack)
-if($appsToDL -gt 0){
+if($enableSlack -and $appsToDL -gt 0){
 	if($appsToDL -eq 1){
 		SlackWrite "*1* new app grabbed!"
-        SlackWrite "*Script has completed in $totalTime*"
-        SlackWrite "============================================================"
 	} else {
 		SlackWrite "*$appsToDL* new apps grabbed!"
-        SlackWrite "*Script has completed in $totalTime*"
-        SlackWrite "============================================================"
 	}
+	SlackWrite "*Script has completed in $totalTime*"
+	SlackWrite "============================================================"
 } else {
-	#SlackWrite "*Sorry! No new apps to grab..*"
+	#SlackWrite "*Sorry! No apps to grab..*"
 }
 
 Write-Host "============================================================" -ForegroundColor 'green'
 Write-Host "Script has completed in $totalTime " -ForegroundColor 'green'
-LogWrite "Script has completed in $totalTime"
 Write-Host "============================================================" -ForegroundColor 'green'
+LogWrite "Script has completed in $totalTime"
 LogWrite   "============================================================"
-
-#IE Fix
-reg delete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3" /v 1A10 /f
