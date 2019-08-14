@@ -9,7 +9,6 @@ What you'll need to run AppGrabber
 ```
 Powershell 5.1+
 7-Zip (Included)
-Advanced Installer
 
 ```
 
@@ -23,8 +22,6 @@ Completed apps will be located in the folder "AppGrabber_Builds".
 ## Built With
 
 * [7-ZIP](https://www.7-zip.org/7z.html) - SFX to create the .EXE file
-* [Advanced Installer](https://www.advancedinstaller.com/) - Used for creating the .MSI file
-
 
 ## Authors
 
