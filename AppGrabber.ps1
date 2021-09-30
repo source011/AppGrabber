@@ -66,7 +66,7 @@ function Get-ChocoPackageVersion {
 		# Example: https://chocolatey.org/packages/GoogleChrome
 		[String]$ChocoPackageURL
 	)
-	$script:ChocoPackageVersion = ((Invoke-RestMethod -Uri "https://chocolatey.org/packages/GoogleChrome").Split("`r`n") | Select-String "<title>").ToString() -split " " -replace "</title>",""  | Select-Object -Last 1
+	$script:ChocoPackageVersion = ((Invoke-RestMethod -Uri "$ChocoPackageURL").Split("`r`n") | Select-String "<title>").ToString() -split " " -replace "</title>",""  | Select-Object -Last 1
   }
   
 
